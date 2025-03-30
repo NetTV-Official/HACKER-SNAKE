@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>H4CK3R SNAKE - CREATED BY ALFIE TRUELOVE</title>
     <style>
         :root {
@@ -17,6 +17,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: none;
         }
 
         body {
@@ -173,6 +174,7 @@
             box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
             max-width: 90vw;
             max-height: 60vh;
+            touch-action: none;
         }
 
         .controls {
@@ -215,6 +217,46 @@
             font-size: 1.2rem;
             margin-top: 10px;
             display: none;
+        }
+
+        #mobile-controls {
+            display: none;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 300px;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        #mobile-controls button {
+            width: 100%;
+            height: 60px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+
+        #up-btn {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        #left-btn {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        #right-btn {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        #down-btn {
+            grid-column: 2;
+            grid-row: 3;
         }
 
         @keyframes fbi-alert {
@@ -343,6 +385,10 @@
             button {
                 padding: 8px 15px;
             }
+            
+            #mobile-controls {
+                display: grid;
+            }
         }
 
         /* Fullscreen styles */
@@ -372,7 +418,7 @@
     <div id="launch-screen">
         <h1>H4CK3R SNAKE</h1>
 	<p>CREATED BY ALFIE TRUELOVE</p>
-        <p>CLICK ANYWHERE TO LAUNCH - PRESS F11 FOR FULL SCREEN</p>
+        <p>CLICK ANYWHERE TO LAUNCH</p>
     </div>
 
     <div class="terminal" id="terminal">
@@ -403,8 +449,14 @@
             <button id="start-btn">INITIATE</button>
             <button id="reset-btn">REBOOT</button>
         </div>
+        <div id="mobile-controls">
+            <button id="up-btn">↑</button>
+            <button id="left-btn">←</button>
+            <button id="right-btn">→</button>
+            <button id="down-btn">↓</button>
+        </div>
         <div class="instructions">
-            <p>USE ARROW KEYS OR WASD TO CONTROL THE SNAKE</p>
+            <p id="controls-instruction">USE ARROW KEYS OR WASD TO CONTROL THE SNAKE</p>
             <p id="fbi-warning">WARNING: FBI TRACKING IN PROGRESS</p>
         </div>
     </div>
@@ -432,6 +484,12 @@
         const eatSound = document.getElementById('eat-sound');
         const gameoverSound = document.getElementById('gameover-sound');
         const fbiSound = document.getElementById('fbi-sound');
+        const controlsInstruction = document.getElementById('controls-instruction');
+        const mobileControls = document.getElementById('mobile-controls');
+        const upBtn = document.getElementById('up-btn');
+        const leftBtn = document.getElementById('left-btn');
+        const rightBtn = document.getElementById('right-btn');
+        const downBtn = document.getElementById('down-btn');
 
         // Set canvas size based on window size
         function resizeCanvas() {
@@ -459,6 +517,9 @@
         let fbiAlerts = [];
         let fbiInterval;
         let glitchEffect = false;
+        let isMobile = false;
+        let touchStartX = 0;
+        let touchStartY = 0;
 
         // Boot sequence messages
         const bootMessages = [
@@ -478,6 +539,17 @@
             "2. MEDIUM - System glitches",
             "3. HARD - FBI tracking active"
         ];
+
+        // Check if mobile device
+        function checkIfMobile() {
+            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                controlsInstruction.textContent = "SWIPE TO CONTROL THE SNAKE";
+                mobileControls.style.display = 'grid';
+            } else {
+                mobileControls.style.display = 'none';
+            }
+        }
 
         // Initialize the game with hacker boot sequence
         function initBootSequence() {
@@ -555,15 +627,22 @@
             // Add start prompt
             const startPrompt = document.createElement('p');
             startPrompt.className = 'boot-line';
-            startPrompt.textContent = "> PRESS ANY KEY TO CONTINUE";
+            startPrompt.textContent = isMobile ? "> TAP TO CONTINUE" : "> PRESS ANY KEY TO CONTINUE";
             terminalBody.appendChild(startPrompt);
             terminalBody.scrollTop = terminalBody.scrollHeight;
             
-            // Set up key listener to start game
-            document.addEventListener('keydown', function startGameOnKey() {
-                document.removeEventListener('keydown', startGameOnKey);
-                showGame();
-            });
+            // Set up listener to start game
+            if (isMobile) {
+                terminalBody.addEventListener('click', function startGameOnTap() {
+                    terminalBody.removeEventListener('click', startGameOnTap);
+                    showGame();
+                });
+            } else {
+                document.addEventListener('keydown', function startGameOnKey() {
+                    document.removeEventListener('keydown', startGameOnKey);
+                    showGame();
+                });
+            }
         }
 
         // Show the game after boot sequence
@@ -1021,6 +1100,60 @@
             }
         }
 
+        // Handle touch events for swipe controls
+        function handleTouchStart(e) {
+            if (!gameRunning) return;
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        }
+
+        function handleTouchEnd(e) {
+            if (!gameRunning) return;
+            const touch = e.changedTouches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            // Determine primary direction of swipe
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal swipe
+                if (dx > 0 && direction !== 'left') {
+                    nextDirection = 'right';
+                } else if (dx < 0 && direction !== 'right') {
+                    nextDirection = 'left';
+                }
+            } else {
+                // Vertical swipe
+                if (dy > 0 && direction !== 'up') {
+                    nextDirection = 'down';
+                } else if (dy < 0 && direction !== 'down') {
+                    nextDirection = 'up';
+                }
+            }
+        }
+
+        // Handle mobile control buttons
+        function setupMobileControls() {
+            upBtn.addEventListener('click', () => {
+                if (direction !== 'down') nextDirection = 'up';
+            });
+            
+            leftBtn.addEventListener('click', () => {
+                if (direction !== 'right') nextDirection = 'left';
+            });
+            
+            rightBtn.addEventListener('click', () => {
+                if (direction !== 'left') nextDirection = 'right';
+            });
+            
+            downBtn.addEventListener('click', () => {
+                if (direction !== 'up') nextDirection = 'down';
+            });
+        }
+
         // Start the game
         function startGame() {
             if (gameRunning || !difficulty) return;
@@ -1052,8 +1185,16 @@
         launchScreen.addEventListener('click', () => {
             launchScreen.style.display = 'none';
             terminal.style.display = 'flex';
+            checkIfMobile();
             initBootSequence();
         });
+
+        // Touch event listeners for swipe controls
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        // Mobile control buttons
+        setupMobileControls();
 
         startBtn.addEventListener('click', startGame);
         resetBtn.addEventListener('click', resetGame);
