@@ -1,116 +1,110 @@
 <!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hacker Snake - Windows 95 Edition</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            background-color: black;
-            font-family: 'Courier New', monospace;
-            color: #00FF00;
-            text-align: center;
-        }
-        .window {
-            background: silver;
-            width: 500px;
-            border: 3px solid black;
-            box-shadow: 5px 5px gray;
-            margin: auto;
-            padding: 10px;
-        }
-        .title-bar {
-            background: navy;
-            color: white;
-            padding: 5px;
-            text-align: left;
-            font-weight: bold;
-        }
-        canvas {
-            background: black;
-            display: block;
-            margin: 10px auto;
-        }
-        .cutscene {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            color: #00FF00;
-            text-align: center;
-            font-size: 24px;
-            padding-top: 20%;
+            cursor: url('https://lh3.googleusercontent.com/proxy/Cdic03wYL7pdrf9y5Dns9SEbHd20V9sDnDJpsEIrWyJcD6bJH7rFrjppVqnKxHs7tbiDgMpLvAiuRjy-kYH__a0XkP2dbTbZNJt2Vmr2P-uU76o'), auto;
+            background-color: #008080;
+            font-family: 'MS Sans Serif', Geneva, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            image-rendering: pixelated;
         }
     </style>
 </head>
 <body>
-    <div id="cutscene" class="cutscene">ACCESSING... <br> LOADING SNAKE.EXE</div>
-    <div class="window" id="gameWindow" style="display:none;">
-        <div class="title-bar">C:\WINDOWS\System32\Snake.exe</div>
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <p>Use arrow keys to navigate. Avoid system errors!</p>
+    <div id="vhsIntro" class="vhs-intro">
+        <div class="vhs-overlay"></div>
+        <div class="vhs-content">
+            <div class="vhs-logo">NETTV</div>
+            <div class="vhs-title">HACKER SNAKE</div>
+            <div class="vhs-credits">
+                <div>Developed by Alfie Truelove</div>
+                <div>Published by NetTV Official</div>
+                <div class="vhs-year">© 1995</div>
+            </div>
+        </div>
     </div>
 
-    <script>
-        setTimeout(() => {
-            document.getElementById("cutscene").style.display = "none";
-            document.getElementById("gameWindow").style.display = "block";
-            startGame();
-        }, 3000);
+    <div id="bootScreen" class="window" style="display:none;">
+        <div class="title-bar">
+            <span class="title-icon">☺</span>
+            <span class="title-text">Snake Boot Menu</span>
+            <span class="window-controls">[—] [×]</span>
+        </div>
+        <div class="window-content">
+            <h2>Select Difficulty:</h2>
+            <div class="difficulty-options">
+                <button class="difficulty-btn" data-difficulty="easy">1. Easy (Slow)</button>
+                <button class="difficulty-btn" data-difficulty="normal">2. Normal</button>
+                <button class="difficulty-btn" data-difficulty="hard">3. Hard (Fast)</button>
+                <button class="difficulty-btn" data-difficulty="extreme">4. Extreme (Insane)</button>
+            </div>
+            <div class="boot-footer">Press number keys 1-4 or click to select</div>
+        </div>
+    </div>
 
-        function startGame() {
-            const canvas = document.getElementById("gameCanvas");
-            const ctx = canvas.getContext("2d");
-            const gridSize = 20;
-            let snake = [{x: 200, y: 200}];
-            let dx = gridSize;
-            let dy = 0;
-            let food = { x: 100, y: 100 };
-            let errors = [];
-            let score = 0;
+    <div id="cutscene" class="cutscene" style="display:none;">
+        <div class="scanlines"></div>
+        <div class="terminal-text">C:\> snake.exe</div>
+        <div class="terminal-text">LOADING...</div>
+        <div class="noise"></div>
+    </div>
+    
+    <div id="gameWindow" class="window" style="display:none;">
+        <div class="title-bar">
+            <span class="title-icon">☺</span>
+            <span class="title-text">C:\WINDOWS\SYSTEM32\SNAKE.EXE</span>
+            <span class="window-controls">[—] [×]</span>
+        </div>
+        <div class="window-content">
+            <canvas id="gameCanvas" width="400" height="300"></canvas> <!-- 4:3 ratio -->
+            <div class="status-bar">
+                <span>Score: <span id="scoreDisplay">0</span></span>
+                <span>Difficulty: <span id="difficultyDisplay">NORMAL</span></span>
+            </div>
+        </div>
+    </div>
 
-            document.addEventListener("keydown", (e) => {
-                if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -gridSize; }
-                if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = gridSize; }
-                if (e.key === "ArrowLeft" && dx === 0) { dx = -gridSize; dy = 0; }
-                if (e.key === "ArrowRight" && dx === 0) { dx = gridSize; dy = 0; }
-            });
+    <div id="blueScreen" class="blue-screen" style="display:none;">
+        <div class="bsod-content">
+            <div class="bsod-header">A problem has been detected and the system has been shut down.</div>
+            <div class="bsod-text">
+                <p>CRITICAL_PROCESS_DIED</p>
+                <p>Technical information:</p>
+                <p>*** STOP: 0x<span id="errorCode">0000007E</span></p>
+                <p>*** SNAKE.EXE - Address <span id="errorAddress">0x00400000</span></p>
+                <p>*** Score: <span id="finalScore">0</span></p>
+                <br>
+                <p>Press any key to return to boot menu</p>
+            </div>
+        </div>
+    </div>
 
-            function gameLoop() {
-                let head = { x: snake[0].x + dx, y: snake[0].y + dy };
-                if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(seg => seg.x === head.x && seg.y === head.y)) {
-                    alert("System Error: Blue Screen Detected! Game Over.");
-                    document.location.reload();
-                }
-                snake.unshift(head);
-                if (head.x === food.x && head.y === food.y) {
-                    score++;
-                    food = { x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize, y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize };
-                    if (score % 5 === 0) {
-                        errors.push({ x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize, y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize });
-                    }
-                } else {
-                    snake.pop();
-                }
-                drawGame();
-            }
+    <script src="game.js"></script>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
 
-            function drawGame() {
-                ctx.fillStyle = "black";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "red";
-                ctx.fillRect(food.x, food.y, gridSize, gridSize);
-                ctx.fillStyle = "lime";
-                snake.forEach(seg => ctx.fillRect(seg.x, seg.y, gridSize, gridSize));
-                ctx.fillStyle = "yellow";
-                errors.forEach(err => ctx.fillRect(err.x, err.y, gridSize, gridSize));
-            }
-
-            setInterval(gameLoop, 150);
-        }
-    </script>
 </body>
 </html>
