@@ -6,7 +6,20 @@
     <title>Hacker Snake - 1995</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-      /* VHS Intro Styles */
+        body {
+            cursor: url('https://lh3.googleusercontent.com/proxy/Cdic03wYL7pdrf9y5Dns9SEbHd20V9sDnDJpsEIrWyJcD6bJH7rFrjppVqnKxHs7tbiDgMpLvAiuRjy-kYH__a0XkP2dbTbZNJt2Vmr2P-uU76o'), auto;
+            background-color: #008080;
+            font-family: 'MS Sans Serif', Geneva, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
+	/* VHS Intro Styles */
 .vhs-intro {
     position: fixed;
     top: 0;
@@ -542,6 +555,5 @@ function startGame() {
     gameInterval = setInterval(gameLoop, gameSpeed);
 }
 </script>
-//THIS CODE WILL BE CHANGED
 </body>
 </html>
